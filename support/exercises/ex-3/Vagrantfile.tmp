@@ -1,0 +1,43 @@
+require 'vagrant-openstack-plugin'
+
+Vagrant.configure("2") do |config|
+  # "dummy" box because we're using Glance
+  config.vm.box = "dummy"
+
+  # SSH key
+  config.ssh.private_key_path = '~/.ssh/id_rsa'
+
+  # Basic OpenStack options
+  # Note that an openrc file needs sourced before using
+  config.vm.provider :openstack do |os|
+    os.username        = ENV['OS_USERNAME']
+    os.api_key         = ENV['OS_PASSWORD']
+    os.tenant          = ENV['OS_TENANT_NAME']
+    os.flavor          = /m1.tiny/
+    os.image           = 'Ubuntu 14.04'
+    os.endpoint        = "#{ENV['OS_AUTH_URL']}/tokens"
+    os.keypair_name    = "adass"
+    os.ssh_username    = "ubuntu"
+    os.security_groups = ['default']
+    os.networks        = []
+    os.address_id      = 'cybera'
+  end
+
+  # Define the instance
+  config.vm.define '__NAME__'
+
+  # Run a shell script
+  config.vm.provision 'shell', path: 'vagrant-shell.sh'
+
+  # Run a Puppet manifest
+  config.vm.provision 'puppet' do |puppet|
+    puppet.manifests_path = 'manifests'
+    puppet.manifest_file = 'default.pp'
+  end
+
+  # Run ServerSpec to test the server
+  config.vm.provision :serverspec do |spec|
+    spec.pattern = 'spec/*_spec.rb'
+  end
+
+end
