@@ -16,9 +16,3 @@ Edmonton:
     ssh <your name>@yeg-adass.cybera.ca
 
 The password is the same as your username.
-
-
-## Things to do still
-
-Finalize slides and figure out what info should be in first hour (easier once
-we have list?_
